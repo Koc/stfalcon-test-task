@@ -1,0 +1,8 @@
+test_task_tags:
+    resource: "@TestTaskTagsBundle/Resources/config/routing.xml"
+    prefix:   /
+
+test_task_photos:
+    resource: "@TestTaskPhotosBundle/Resources/config/routing.xml"
+    prefix:   /
+
