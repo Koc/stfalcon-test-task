@@ -1,0 +1,21 @@
+TestTask\TagsBundle\Entity\Tag:
+    tag_1:
+        title: Abyssinian
+    tag_2:
+        title: Aegean
+    tag_3:
+        title: Thai
+    tag_4:
+        title: American Bobtail
+    tag_5:
+        title: Bengal
+    tag_6:
+        title: Birman
+    tag_7:
+        title: Turkish Angora
+    tag_8:
+        title: Arabian Mau
+    tag_9:
+        title: Munchkin
+    tag_10:
+        title: Siberian

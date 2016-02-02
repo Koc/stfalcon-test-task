@@ -1,0 +1,3 @@
+TestTask\PhotosBundle\Entity\Photo:
+    photo_{1..50}:
+        setFileFixture: ["<imageUrl($width = 800, $height = 600, $category = 'cats', $randomize = true, $word = 'Hello world')>", "test-image-<current()>.jpeg"]

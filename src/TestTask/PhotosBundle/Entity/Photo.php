@@ -3,12 +3,15 @@
 namespace TestTask\PhotosBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
- * Photo
- *
  * @ORM\Table(name="photo")
  * @ORM\Entity(repositoryClass="TestTask\PhotosBundle\Repository\PhotoRepository")
+ *
+ * @Vich\Uploadable
  */
 class Photo
 {
@@ -56,6 +59,17 @@ class Photo
      */
     private $fileOriginalName;
 
+    /**
+     * @Vich\UploadableField(mapping="photos", fileNameProperty="filePath")
+     *
+     * @var File
+     */
+    private $file;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
     /**
      * Get id
@@ -180,5 +194,42 @@ class Photo
     public function getFileOriginalName()
     {
         return $this->fileOriginalName;
+    }
+
+    /**
+     * @return File|null
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param File|null $file
+     */
+    public function setFile(File $file = null)
+    {
+        $this->file = $file;
+
+        $this->fileMimeType = $this->file->getMimeType();
+        $this->fileSize = $this->file->getSize();
+        if ($this->file instanceof UploadedFile) {
+            $this->fileOriginalName = $this->file->getClientOriginalName();
+        }
+
+//        dump($this);
+    }
+
+    public function setFileFixture($filePath, $originalName)
+    {
+//        var_dump(func_get_args());exit;
+
+//        $file = tmpfile();
+//        fwrite($file, file_get_contents($filePath));
+//        $tmpFilePath = stream_get_meta_data($file)['uri'];
+        $tmpFilePath = tempnam(sys_get_temp_dir(), 'image-');
+        copy($filePath, $tmpFilePath);
+
+        $this->setFile(new UploadedFile($tmpFilePath, $originalName, null, null, null, true));
     }
 }
