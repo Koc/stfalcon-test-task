@@ -22,6 +22,9 @@ class AppKernel extends Kernel
             new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
             new Vich\UploaderBundle\VichUploaderBundle(),
             new Liip\ImagineBundle\LiipImagineBundle(),
+
+            new TestTask\PhotosBundle\TestTaskPhotosBundle(),
+            new TestTask\TagsBundle\TestTaskTagsBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {
