@@ -22,7 +22,8 @@
         "nelmio/api-doc-bundle": "^2.11",
         "vich/uploader-bundle": "^0.14.0",
         "liip/imagine-bundle": "^1.4",
-        "doctrine/doctrine-migrations-bundle": "^1.1"
+        "doctrine/doctrine-migrations-bundle": "^1.1",
+        "jms/serializer-bundle": "^1.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
