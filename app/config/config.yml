@@ -92,6 +92,8 @@ fos_rest:
     routing_loader:
         default_format: json
 
+nelmio_api_doc: ~
+
 vich_uploader:
     db_driver: orm
     mappings:
