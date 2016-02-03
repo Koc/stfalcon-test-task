@@ -6,7 +6,15 @@
 
     <services>
         <service id="test_task_photos.vich_uploader.namer" class="TestTask\PhotosBundle\VichUploader\ShaNamer" />
-        <service id="test_task_photos.vich_uploader.directory_namer" class="TestTask\PhotosBundle\VichUploader\DirectoryNamer" />
+        <service id="test_task_photos.vich_uploader.directory_namer"
+                 class="TestTask\PhotosBundle\VichUploader\DirectoryNamer" />
+
+        <service id="test_task_photos.serializer.photos_handler" class="TestTask\PhotosBundle\Serializer\PhotosHandler">
+            <argument type="service" id="vich_uploader.templating.helper.uploader_helper" />
+            <argument type="service" id="liip_imagine.cache.manager" />
+            <tag name="jms_serializer.event_subscriber" />
+        </service>
+
     </services>
 
 </container>

@@ -1,3 +1,6 @@
+_liip_imagine:
+    resource: "@LiipImagineBundle/Resources/config/routing.xml"
+
 test_task_photos_api:
     type:     rest
     resource: TestTask\PhotosBundle\Controller\ApiController

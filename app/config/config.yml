@@ -7,6 +7,7 @@ imports:
 parameters:
     locale: en
     upload_dir: %kernel.root_dir%/../upload
+    liip_imagine.meta_data.reader.class: "Imagine\Image\Metadata\DefaultMetadataReader"
 
 framework:
     #esi:             ~
@@ -59,6 +60,30 @@ swiftmailer:
 #sensio_framework_extra:
 #    view:
 #        annotations: false
+
+liip_imagine:
+    loaders:
+        default:
+            filesystem:
+                data_root: %upload_dir%
+    driver: gd
+    filter_sets:
+        photos_sq100:
+            quality: 85
+            filters:
+                thumbnail: { size: [100, 100], mode: outbound }
+        photos_sq200:
+            quality: 85
+            filters:
+                thumbnail: { size: [200, 200], mode: outbound }
+        photos_400x225:
+            quality: 85
+            filters:
+                thumbnail: { size: [400, 225], mode: outbound }
+        photos_800x450:
+            quality: 85
+            filters:
+                thumbnail: { size: [800, 450], mode: outbound }
 
 fos_rest:
     param_fetcher_listener: force

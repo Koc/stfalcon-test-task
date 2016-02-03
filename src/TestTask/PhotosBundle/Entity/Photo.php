@@ -4,6 +4,7 @@ namespace TestTask\PhotosBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use TestTask\TagsBundle\Entity\Tag;
@@ -12,6 +13,9 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 /**
  * @ORM\Table(name="photo")
  * @ORM\Entity(repositoryClass="TestTask\PhotosBundle\Repository\PhotoRepository")
+ *
+ * @Serializer\ExclusionPolicy("ALL")
+ * @Serializer\AccessorOrder("custom", custom = {"id", "title", "createdAt", "getTagsAsArray"})
  *
  * @Vich\Uploadable
  */
@@ -23,6 +27,8 @@ class Photo
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Serializer\Expose()
      */
     private $id;
 
@@ -30,6 +36,8 @@ class Photo
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
+     *
+     * @Serializer\Expose()
      */
     private $createdAt;
 
@@ -58,6 +66,10 @@ class Photo
      * @var string
      *
      * @ORM\Column(name="file_original_name", type="string", length=255)
+     *
+     * @Serializer\Expose()
+     * @Serializer\SerializedName("title")
+     * @Serializer\Accessor(getter="getTitle")
      */
     private $fileOriginalName;
 
@@ -206,6 +218,11 @@ class Photo
         return $this->fileOriginalName;
     }
 
+    public function getTitle()
+    {
+        return pathinfo($this->fileOriginalName, PATHINFO_FILENAME);
+    }
+
     public function addTag(Tag $tag)
     {
         $photoTag = new PhotoTag();
@@ -219,12 +236,30 @@ class Photo
         //TODO: implement
     }
 
-    /**
-     * @return ArrayCollection|PhotoTag[]
-     */
-    public function getPhotoTags()
+    public function getTags()
     {
-        return $this->photoTags;
+        $tags = array();
+        foreach ($this->photoTags as $photoTag) {
+            $tags[] = $photoTag->getTag();
+        }
+
+        return $tags;
+    }
+
+    /**
+     * @Serializer\VirtualProperty()
+     * @Serializer\SerializedName("tags")
+     *
+     * @return array
+     */
+    public function getTagsAsArray()
+    {
+        $tags = array();
+        foreach ($this->photoTags as $photoTag) {
+            $tags[] = $photoTag->getTag()->getTitle();
+        }
+
+        return $tags;
     }
 
     /**
@@ -247,7 +282,6 @@ class Photo
         if ($this->file instanceof UploadedFile) {
             $this->fileOriginalName = $this->file->getClientOriginalName();
         }
-
 //        dump($this);
     }
 
