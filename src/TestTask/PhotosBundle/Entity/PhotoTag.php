@@ -26,7 +26,7 @@ class PhotoTag
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Photo")
+     * @ORM\ManyToOne(targetEntity="Photo", inversedBy="photoTags")
      * @ORM\JoinColumn(name="photo_id", nullable=false)
      *
      * @var Photo

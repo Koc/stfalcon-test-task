@@ -2,9 +2,11 @@
 
 namespace TestTask\PhotosBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use TestTask\TagsBundle\Entity\Tag;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
@@ -60,6 +62,13 @@ class Photo
     private $fileOriginalName;
 
     /**
+     * @ORM\OneToMany(targetEntity="PhotoTag", mappedBy="photo", cascade={"persist"}, orphanRemoval=true)
+     *
+     * @var ArrayCollection|PhotoTag[]
+     */
+    private $photoTags;
+
+    /**
      * @Vich\UploadableField(mapping="photos", fileNameProperty="filePath")
      *
      * @var File
@@ -69,6 +78,7 @@ class Photo
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->photoTags = new ArrayCollection();
     }
 
     /**
@@ -194,6 +204,27 @@ class Photo
     public function getFileOriginalName()
     {
         return $this->fileOriginalName;
+    }
+
+    public function addTag(Tag $tag)
+    {
+        $photoTag = new PhotoTag();
+        $photoTag->setTag($tag);
+        $photoTag->setPhoto($this);
+        $this->photoTags->add($photoTag);
+    }
+
+    public function removeTag(Tag $tag)
+    {
+        //TODO: implement
+    }
+
+    /**
+     * @return ArrayCollection|PhotoTag[]
+     */
+    public function getPhotoTags()
+    {
+        return $this->photoTags;
     }
 
     /**
