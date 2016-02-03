@@ -1,8 +1,3 @@
-test_task_tags:
-    resource: "@TestTaskTagsBundle/Resources/config/routing.xml"
-    prefix:   /
-
-test_task_photos:
-    resource: "@TestTaskPhotosBundle/Resources/config/routing.xml"
-    prefix:   /
-
+test_task_photos_api:
+    type:     rest
+    resource: TestTask\PhotosBundle\Controller\ApiController
