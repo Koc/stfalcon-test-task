@@ -27,7 +27,7 @@ class PhotoTag
 
     /**
      * @ORM\ManyToOne(targetEntity="Photo", inversedBy="photoTags")
-     * @ORM\JoinColumn(name="photo_id", nullable=false)
+     * @ORM\JoinColumn(name="photo_id", nullable=false, onDelete="CASCADE")
      *
      * @var Photo
      */
@@ -35,7 +35,7 @@ class PhotoTag
 
     /**
      * @ORM\ManyToOne(targetEntity="TestTask\TagsBundle\Entity\Tag")
-     * @ORM\JoinColumn(name="tag_id", nullable=false)
+     * @ORM\JoinColumn(name="tag_id", nullable=false, onDelete="CASCADE")
      *
      * @var Tag
      */

@@ -6,8 +6,11 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use TestTask\PhotosBundle\Entity\Photo;
 use TestTask\PhotosBundle\Model\PhotosCollection;
+use TestTask\TagsBundle\Entity\Tag;
 
 // http://symfony.com/doc/master/bundles/FOSRestBundle/5-automatic-route-generation_single-restful-controller.html
 
@@ -42,7 +45,42 @@ class ApiController extends Controller
         return new PhotosCollection($pagerfanta);
     }
 
-    public function deletePhotoAction($id)
+    /**
+     * @ApiDoc(description="Deletes photo.")
+     *
+     * @ParamConverter("photo", class="TestTaskPhotosBundle:Photo")
+     *
+     * @Rest\Delete("/photos/{id}")
+     * @Rest\View()
+     */
+    public function deletePhotoAction(Photo $photo)
     {
+        $em = $this->getDoctrine()->getManager();
+
+        $em->remove($photo);
+        $em->flush();
+
+        return array('status' => 'success');
+    }
+
+    /**
+     * @ApiDoc(description="Deletes tags.")
+     *
+     * @Rest\Post("/tags")
+     * @Rest\RequestParam(name="tags", requirements=".+", array=true, allowBlank=false, description="Tags titles for deletion.")
+     * @Rest\View()
+     */
+    public function deleteTagAction(array $tags)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $tags = $em->getRepository('TestTaskTagsBundle:Tag')->findBy(array('title' => $tags));
+        foreach ($tags as $tag) {
+            $em->remove($tag);
+        }
+
+        $em->flush();
+
+        return array('status' => 'success');
     }
 }

@@ -57,7 +57,10 @@ swiftmailer:
     password:  "%mailer_password%"
     spool:     { type: memory }
 
-#sensio_framework_extra:
+sensio_framework_extra:
+    request:
+        converters: true
+        auto_convert: false
 #    view:
 #        annotations: false
 
