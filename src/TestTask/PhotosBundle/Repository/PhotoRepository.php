@@ -12,4 +12,18 @@ use Doctrine\ORM\EntityRepository;
  */
 class PhotoRepository extends EntityRepository
 {
+    public function getPhotosQb(array $tags = array())
+    {
+        $qb = $this->createQueryBuilder('photo');
+
+        if ($tags) {
+            $qb
+                ->join('photo.photoTags', 'photoTags')
+                ->andWhere('photoTags.tag IN (:tags)')
+                ->setParameter('tags', $tags)
+                ->groupBy('photo.id');
+        }
+
+        return $qb;
+    }
 }

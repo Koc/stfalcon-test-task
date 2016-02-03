@@ -6,7 +6,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use TestTask\PhotosBundle\Entity\Photo;
 use TestTask\PhotosBundle\Model\PhotosCollection;
 
 // http://symfony.com/doc/master/bundles/FOSRestBundle/5-automatic-route-generation_single-restful-controller.html
@@ -16,22 +15,26 @@ use TestTask\PhotosBundle\Model\PhotosCollection;
 class ApiController extends Controller
 {
     /**
-     * @Rest\QueryParam(name="page", requirements="\d+", default="1", nullable=true, description="Page number.")
+     * @Rest\QueryParam(name="page", requirements="\d+", default="1", description="Page number.")
+     * @Rest\QueryParam(name="tags", requirements=".+", array=true, description="Tags for filtering.")
      * @Rest\View()
      */
-    public function getPhotosAction($page)
+    public function getPhotosAction($page, array $tags = array())
     {
-        $qb = $this
-            ->getDoctrine()
-            ->getRepository(Photo::class)
-            ->createQueryBuilder('photo');
+        $doctrine = $this->getDoctrine();
 
+        if ($tags) {
+            $tags = $doctrine->getRepository('TestTaskTagsBundle:Tag')->findBy(array('title' => $tags));
+        }
+
+        $qb = $doctrine
+            ->getRepository('TestTaskPhotosBundle:Photo')
+            ->getPhotosQb($tags);
+
+        //TODO: eagerly load tags
         $pagerfanta = (new Pagerfanta(new DoctrineORMAdapter($qb, false)))
             ->setMaxPerPage(10)
             ->setCurrentPage($page);
-
-//        $helper = $this->container->get('vich_uploader.templating.helper.uploader_helper');
-//        $path = $helper->asset($entity, 'image');
 
         return new PhotosCollection($pagerfanta);
     }
