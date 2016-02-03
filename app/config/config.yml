@@ -89,8 +89,22 @@ fos_rest:
     param_fetcher_listener: force
     view:
         view_response_listener: true
+#        view_response_listener: force
+        force_redirects:
+            html: true
+        formats:
+            json: true
+        mime_types:
+            json: ['application/json', 'application/x-json', 'application/vnd.example-com.foo+json']
+        templating_formats:
+            html: true
+#    routing_loader:
+#        default_format: html
+    format_listener:
+        rules:
+            - { path: ^/, priorities: [ html, json ], fallback_format: ~, prefer_extension: true }
     routing_loader:
-        default_format: json
+        default_format: ~
 
 nelmio_api_doc: ~
 
