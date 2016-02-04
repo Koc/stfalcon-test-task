@@ -29,7 +29,7 @@
                 <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'post_photo'}) }}">Загрузка фото</a></li>
                 <li><a href="#">Добавление тегов к фото</a></li>
                 <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'delete_tags'}) }}">Удаление тегов</a></li>
-                <li><a href="#">Удаление фото</a></li>
+                <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'delete_photo'}) }}">Удаление фото</a></li>
                 <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'get_photos'}) }}">Вывод фото с пагинацией
                         и возможностью фильтрации по тегам</a>
                 <li><a href="{{ path('get_photos') }}">Вывод фото с пагинацией и возможностью фильтрации по тегам</a>
@@ -41,7 +41,7 @@
     <div class="row medium-8 large-7 columns">
         <form name="requestForm" ng-controller="Api.Sandbox.SandboxController as sandboxController">
 
-            <input type="hidden" ng-model="requestMethod" value="{{ config.method|upper }}" initial-value />
+            <input type="hidden" ng-model="requestMethod" value="{{ config.method }}" initial-value />
             <input type="hidden" ng-model="requestUri" value="{{ app.request.getUriForPath(config.uri) }}"
                    initial-value />
 
@@ -68,11 +68,42 @@
                             Method:
                         </td>
                         <td>
-                            {{ config.method|upper }}
+                            {{ config.method }}
                         </td>
                     </tr>
 
-                    {% for fieldName, field in config.fields|default({}) %}
+                    {% if config.params|length %}
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <h4 class="subheader">Параметры запроса</h4>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% for fieldName, field in config.params %}
+                        {% set required = field.required is defined ? field.required : false %}
+
+                        <tr>
+                            <td>
+                                {{ field.label }}{% if required %}*{% endif %}:
+                            </td>
+                            <td>
+                                <input type="text" ng-model="params.{{- fieldName -}}"
+                                       {% if required %}required="required" {% endif %} />
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    {% if config.fields|length %}
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <h4 class="subheader">Поля запроса</h4>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% for fieldName, field in config.fields %}
                         {% set multiple = field.multuple|default(false) %}
                         {% set required = field.required is defined ? field.required : false %}
 
@@ -131,6 +162,15 @@
         editor.setTheme('ace/theme/twilight');
         editor.getSession().setMode('ace/mode/json');
 
+        String.prototype.format = function (o) {
+            return this.replace(/{([^{}]*)}/g,
+                    function (a, b) {
+                        var r = o[b];
+                        return typeof r === 'string' ? r : a;
+                    }
+            );
+        };
+
         angular.module('Api.Sandbox', ['initialValue'])
                 .directive('fileModel', ['$parse', function ($parse) {
                     return {
@@ -151,6 +191,10 @@
 
                         var requestUri = $scope.requestUri.trim();
                         var requestMethod = $scope.requestMethod.trim();
+
+                        if ($scope.params) {
+                            requestUri = requestUri.format($scope.params);
+                        }
 
                         var requestConfig = {
                             method: requestMethod,

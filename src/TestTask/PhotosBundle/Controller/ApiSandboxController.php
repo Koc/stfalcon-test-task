@@ -33,6 +33,16 @@ class ApiSandboxController extends Controller
                     )
                 ),
             ),
+            'delete_photo' => array(
+                'uri' => '/photos/{id}',
+                'method' => 'delete',
+                'params' => array(
+                    'id' => array(
+                        'label' => 'Айди фото',
+                        'required' => true,
+                    )
+                ),
+            ),
             'post_photo' => array(
                 'uri' => '/photos',
                 'method' => 'post',
@@ -50,6 +60,17 @@ class ApiSandboxController extends Controller
                 ),
             ),
         );
+
+        $apiConfig = array_map(function($config) {
+            $config = array_merge(array(
+                'params' => array(),
+                'fields' => array(),
+            ), $config);
+
+            $config['method'] = mb_strtoupper($config['method']);
+
+            return $config;
+        }, $apiConfig);
 
         return $this->render('@TestTaskPhotos/Api/_api_sandbox_layout.html.twig', array('config' => $apiConfig[$api_method]));
     }
