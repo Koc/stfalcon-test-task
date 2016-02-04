@@ -87,6 +87,8 @@ class Photo
      */
     private $file;
 
+    private $tagsAsArray;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -246,6 +248,11 @@ class Photo
         return $tags;
     }
 
+    public function setTagsAsArray(array $tags)
+    {
+        $this->tagsAsArray = $tags;
+    }
+
     /**
      * @Serializer\VirtualProperty()
      * @Serializer\SerializedName("tags")
@@ -254,12 +261,11 @@ class Photo
      */
     public function getTagsAsArray()
     {
-        $tags = array();
-        foreach ($this->photoTags as $photoTag) {
-            $tags[] = $photoTag->getTag()->getTitle();
+        if (null === $this->tagsAsArray) {
+            throw new \LogicException('Call "PhotoRepository::attachTagsToPhotos" first.');
         }
 
-        return $tags;
+        return $this->tagsAsArray;
     }
 
     /**

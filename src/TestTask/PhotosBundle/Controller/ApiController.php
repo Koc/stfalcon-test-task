@@ -4,6 +4,7 @@ namespace TestTask\PhotosBundle\Controller;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Pagerfanta\Adapter\CallbackAdapter;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -34,12 +35,26 @@ class ApiController extends Controller
             $tags = $doctrine->getRepository('TestTaskTagsBundle:Tag')->findBy(array('title' => $tags));
         }
 
-        $qb = $doctrine
-            ->getRepository('TestTaskPhotosBundle:Photo')
-            ->getPhotosQb($tags);
+        $photoRepository = $doctrine->getRepository('TestTaskPhotosBundle:Photo');
 
-        //TODO: eagerly load tags
-        $pagerfanta = (new Pagerfanta(new DoctrineORMAdapter($qb, false)))
+        $qb = $photoRepository->getPhotosQb($tags);
+
+        $innerAdapter = new DoctrineORMAdapter($qb, false);
+        // wrap adapter for getting possibility load tags as primitives
+        $adapter = new CallbackAdapter(
+            function () use ($innerAdapter) {
+                return $innerAdapter->getNbResults();
+            },
+            function ($offset, $length) use ($innerAdapter, $photoRepository) {
+                $results = $innerAdapter->getSlice($offset, $length);
+
+                $photoRepository->attachTagsToPhotos(iterator_to_array($results));
+
+                return $results;
+            }
+        );
+
+        $pagerfanta = (new Pagerfanta($adapter))
             ->setMaxPerPage(10)
             ->setCurrentPage($page ?: 1);
 

@@ -3,6 +3,7 @@
 namespace TestTask\PhotosBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use TestTask\PhotosBundle\Entity\Photo;
 
 /**
  * PhotoRepository
@@ -25,5 +26,33 @@ class PhotoRepository extends EntityRepository
         }
 
         return $qb;
+    }
+
+    /**
+     * @param Photo[] $photos
+     */
+    public function attachTagsToPhotos(array $photos)
+    {
+        if (!$photos) {
+            return;
+        }
+
+        $tags = $this->_em->createQueryBuilder()
+            ->select('IDENTITY(pt.photo) AS photoId, t.title')
+            ->from('TestTaskPhotosBundle:PhotoTag', 'pt')
+            ->join('pt.tag', 't')
+            ->where('pt.photo IN (:photos)')
+            ->setParameter('photos', $photos)
+            ->getQuery()
+            ->getResult();
+
+        $tagsToPhotos = array();
+        foreach ($tags as $tag) {
+            $tagsToPhotos[$tag['photoId']][] = $tag['title'];
+        }
+
+        foreach ($photos as $photo) {
+            $photo->setTagsAsArray(isset($tagsToPhotos[$photo->getId()]) ? $tagsToPhotos[$photo->getId()] : array());
+        }
     }
 }
