@@ -14,6 +14,26 @@ class ApiSandboxController extends Controller
             'delete_tags' => '@TestTaskPhotos/Api/deleteTags.html.twig',
         );
 
-        return $this->render($templates[$api_method]);
+        $apiConfig = array(
+            'post_photo' => array(
+                'uri' => '/photos',
+                'method' => 'post',
+                'fields' => array(
+                    'image' => array(
+                        'label' => 'Фото',
+                        'type' => 'file',
+                        'required' => true,
+                    ),
+                    'tags' => array(
+                        'label' => 'Теги',
+                        'multuple' => true,
+                        'required' => true,
+                    )
+                ),
+            ),
+        );
+
+
+        return $this->render($templates[$api_method], array('config' => $apiConfig[$api_method]));
     }
 }
