@@ -41,7 +41,7 @@ class ApiController extends Controller
         //TODO: eagerly load tags
         $pagerfanta = (new Pagerfanta(new DoctrineORMAdapter($qb, false)))
             ->setMaxPerPage(10)
-            ->setCurrentPage($page);
+            ->setCurrentPage($page ?: 1);
 
         return new PhotosCollection($pagerfanta);
     }

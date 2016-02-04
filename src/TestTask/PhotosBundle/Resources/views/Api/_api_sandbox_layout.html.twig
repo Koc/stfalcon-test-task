@@ -30,6 +30,8 @@
                 <li><a href="#">Добавление тегов к фото</a></li>
                 <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'delete_tags'}) }}">Удаление тегов</a></li>
                 <li><a href="#">Удаление фото</a></li>
+                <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'get_photos'}) }}">Вывод фото с пагинацией
+                        и возможностью фильтрации по тегам</a>
                 <li><a href="{{ path('get_photos') }}">Вывод фото с пагинацией и возможностью фильтрации по тегам</a>
                 </li>
             </ul>
@@ -37,10 +39,10 @@
     </div>
 
     <div class="row medium-8 large-7 columns">
-        <form ng-controller="Api.Sandbox.SandboxController as sandboxController">
+        <form name="requestForm" ng-controller="Api.Sandbox.SandboxController as sandboxController">
 
-            <input type="hidden" ng-model="requestMethod" value="{%- block request_method 'GET' -%}" initial-value />
-            <input type="hidden" ng-model="requestUri" value="{%- block request_uri app.request.getRequestUri() -%}"
+            <input type="hidden" ng-model="requestMethod" value="{{ config.method|upper }}" initial-value />
+            <input type="hidden" ng-model="requestUri" value="{{ app.request.getUriForPath(config.uri) }}"
                    initial-value />
 
             <table>
@@ -52,13 +54,53 @@
                 </thead>
                 <tbody>
 
-                {% block request_params '' %}
+                {% block request_params %}
+                    <tr>
+                        <td>
+                            Uri:
+                        </td>
+                        <td>
+                            {{ config.uri }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Method:
+                        </td>
+                        <td>
+                            {{ config.method|upper }}
+                        </td>
+                    </tr>
+
+                    {% for fieldName, field in config.fields|default({}) %}
+                        {% set multiple = field.multuple|default(false) %}
+                        {% set required = field.required is defined ? field.required : false %}
+
+                        <tr>
+                            <td>
+                                {{ field.label }}{% if required %}*{% endif %}:
+                            </td>
+                            <td>
+                                {% if field.type|default('text') == 'file' %}
+                                    <input type="file" file-model="request.{{- fieldName -}}"
+                                           {% if required %}required="required" {% endif %} />
+                                {% else %}
+                                    <input type="text" ng-model="request.{{- fieldName -}}"
+                                           {% if required %}required="required" {% endif %} {% if multiple %}ng-list=","{% endif %} />
+                                    {% if multiple %}
+                                        <p class="help-text">Можно вводить несколько значений через запятую.</p>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endblock %}
 
                 <tr>
                     <td colspan="2">
                         <input type="submit" ng-click="sandboxController.sendRequest()"
                                ng-class="{'secondary' : requestSubmitting, 'success': !requestSubmitting}"
-                               ng-disabled="requestSubmitting"
+                               ng-disabled="requestSubmitting || !requestForm.$valid"
                                value="send" class="button" />
                     </td>
                 </tr>
@@ -150,6 +192,7 @@
                                     editor.setValue(JSON.stringify(response.data, null, 4), -1);
                                     $scope.requestSubmitting = false;
                                 }, function errorCallback(response) {
+                                    editor.setValue(JSON.stringify(response.data, null, 4), -1);
                                     $scope.requestSubmitting = false;
                                 });
                     }

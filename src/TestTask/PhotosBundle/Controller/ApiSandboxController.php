@@ -8,13 +8,31 @@ class ApiSandboxController extends Controller
 {
     public function sandboxAction($api_method)
     {
-        $templates = array(
-            'delete_photo' => '',
-            'post_photo' => '@TestTaskPhotos/Api/postPhoto.html.twig',
-            'delete_tags' => '@TestTaskPhotos/Api/deleteTags.html.twig',
-        );
-
         $apiConfig = array(
+            'get_photos' => array(
+                'uri' => '/photos',
+                'method' => 'get',
+                'fields' => array(
+                    'page' => array(
+                        'label' => 'Страница',
+                    ),
+                    'tags' => array(
+                        'label' => 'Теги',
+                        'multuple' => true,
+                    )
+                ),
+            ),
+            'delete_tags' => array(
+                'uri' => '/tags',
+                'method' => 'post',
+                'fields' => array(
+                    'tags' => array(
+                        'label' => 'Теги',
+                        'multuple' => true,
+                        'required' => true,
+                    )
+                ),
+            ),
             'post_photo' => array(
                 'uri' => '/photos',
                 'method' => 'post',
@@ -33,7 +51,6 @@ class ApiSandboxController extends Controller
             ),
         );
 
-
-        return $this->render($templates[$api_method], array('config' => $apiConfig[$api_method]));
+        return $this->render('@TestTaskPhotos/Api/_api_sandbox_layout.html.twig', array('config' => $apiConfig[$api_method]));
     }
 }
