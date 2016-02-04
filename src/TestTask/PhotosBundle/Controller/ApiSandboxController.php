@@ -18,7 +18,7 @@ class ApiSandboxController extends Controller
                     ),
                     'tags' => array(
                         'label' => 'Теги',
-                        'multuple' => true,
+                        'multiple' => true,
                     )
                 ),
             ),
@@ -28,7 +28,7 @@ class ApiSandboxController extends Controller
                 'fields' => array(
                     'tags' => array(
                         'label' => 'Теги',
-                        'multuple' => true,
+                        'multiple' => true,
                         'required' => true,
                     )
                 ),
@@ -54,7 +54,7 @@ class ApiSandboxController extends Controller
                     ),
                     'tags' => array(
                         'label' => 'Теги',
-                        'multuple' => true,
+                        'multiple' => true,
                         'required' => true,
                     )
                 ),
@@ -71,7 +71,7 @@ class ApiSandboxController extends Controller
                 'fields' => array(
                     'tags' => array(
                         'label' => 'Теги',
-                        'multuple' => true,
+                        'multiple' => true,
                         'required' => true,
                     )
                 ),

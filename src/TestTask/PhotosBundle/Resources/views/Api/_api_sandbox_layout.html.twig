@@ -105,7 +105,7 @@
                     {% endif %}
 
                     {% for fieldName, field in config.fields %}
-                        {% set multiple = field.multuple|default(false) %}
+                        {% set multiple = field.multiple|default(false) %}
                         {% set required = field.required is defined ? field.required : false %}
 
                         <tr>
