@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
 use TestTask\TagsBundle\Entity\Tag;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
@@ -82,6 +83,8 @@ class Photo
 
     /**
      * @Vich\UploadableField(mapping="photos", fileNameProperty="filePath")
+     * @Assert\NotBlank()
+     * @Assert\Image(minWidth="100", minHeight="100")
      *
      * @var File
      */
@@ -261,8 +264,13 @@ class Photo
      */
     public function getTagsAsArray()
     {
-        if (null === $this->tagsAsArray) {
-            throw new \LogicException('Call "PhotoRepository::attachTagsToPhotos" first.');
+        if (null !== $this->tagsAsArray) {
+            return $this->tagsAsArray;
+        }
+
+        $this->tagsAsArray = array();
+        foreach ($this->photoTags as $photoTag) {
+            $this->tagsAsArray[] = $photoTag->getTag()->getTitle();
         }
 
         return $this->tagsAsArray;

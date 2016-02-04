@@ -89,6 +89,7 @@ liip_imagine:
                 thumbnail: { size: [800, 450], mode: outbound }
 
 fos_rest:
+    disable_csrf_role: IS_AUTHENTICATED_ANONYMOUSLY
     param_fetcher_listener: force
     view:
         view_response_listener: true

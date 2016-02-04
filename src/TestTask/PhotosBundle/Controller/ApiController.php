@@ -3,6 +3,7 @@
 namespace TestTask\PhotosBundle\Controller;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Request\ParamFetcher;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Pagerfanta\Adapter\CallbackAdapter;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
@@ -11,6 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use TestTask\PhotosBundle\Entity\Photo;
+use TestTask\PhotosBundle\Form\PhotoType;
 use TestTask\PhotosBundle\Model\PhotosCollection;
 
 // http://symfony.com/doc/master/bundles/FOSRestBundle/5-automatic-route-generation_single-restful-controller.html
@@ -68,18 +70,23 @@ class ApiController extends Controller
      * @Rest\RequestParam(name="tags", requirements=".+", nullable=false, map=true, description="Tags that associates photo.")
      * @Rest\View()
      */
-    public function postPhotoAction(UploadedFile $image, array $tags)
+    public function postPhotoAction(ParamFetcher $paramFetcher, array $tags)
     {
         $em = $this->getDoctrine()->getManager();
 
-        //TODO: add validation and maybe form
+        $photo = new Photo();
+        $form = $this->createForm(PhotoType::class, $photo);
 
         if ($tags) {
             $tags = $em->getRepository('TestTaskTagsBundle:Tag')->findOrCreateByTitles($tags);
         }
 
-        $photo = new Photo();
-        $photo->setFile($image);
+        $form->submit($paramFetcher->all());
+
+        if (!$form->isValid()) {
+            return $form->getErrors();
+        }
+
         foreach ($tags as $tag) {
             $photo->addTag($tag);
         }
