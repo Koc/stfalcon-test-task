@@ -27,7 +27,8 @@
                 {#<li class="menu-text">Blog</li>#}
                 <li><a href="{{ path('nelmio_api_doc_index') }}">Документация API</a></li>
                 <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'post_photo'}) }}">Загрузка фото</a></li>
-                <li><a href="#">Добавление тегов к фото</a></li>
+                <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'post_tags_to_photo'}) }}">Добавление тегов
+                        к фото</a></li>
                 <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'delete_tags'}) }}">Удаление тегов</a></li>
                 <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'delete_photo'}) }}">Удаление фото</a></li>
                 <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'get_photos'}) }}">Вывод фото с пагинацией
@@ -166,6 +167,7 @@
             return this.replace(/{([^{}]*)}/g,
                     function (a, b) {
                         var r = o[b];
+
                         return typeof r === 'string' ? r : a;
                     }
             );
@@ -183,7 +185,7 @@
                         }
                     };
                 }])
-                .controller('Api.Sandbox.SandboxController', ['$scope', '$http', function ($scope, $http, Upload) {
+                .controller('Api.Sandbox.SandboxController', ['$scope', '$http', function ($scope, $http) {
                     $scope.requestSubmitting = false;
 
                     this.sendRequest = function () {
@@ -232,7 +234,6 @@
 
                         $http(requestConfig)
                                 .then(function successCallback(response) {
-//                                    console.log(response);
                                     editor.setValue(JSON.stringify(response.data, null, 4), -1);
                                     $scope.requestSubmitting = false;
                                 }, function errorCallback(response) {

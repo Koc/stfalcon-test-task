@@ -24,8 +24,8 @@ class PhotosHandler implements EventSubscriberInterface
     public function onPostSerialize(ObjectEvent $event)
     {
         $object = $event->getObject();
-        $visitior = $event->getVisitor();
-        /* @var $visitior GenericSerializationVisitor */
+        $visitor = $event->getVisitor();
+        /* @var $visitor GenericSerializationVisitor */
 
         $path = $this->uploaderHelper->asset($object, 'file');
 
@@ -34,7 +34,7 @@ class PhotosHandler implements EventSubscriberInterface
             $urls[$pattern] = $this->cacheManager->getBrowserPath($path, sprintf('photos_%s', $pattern));
         }
 
-        $visitior->addData('image_urls', $urls);
+        $visitor->addData('image_urls', $urls);
     }
 
     public static function getSubscribedEvents()

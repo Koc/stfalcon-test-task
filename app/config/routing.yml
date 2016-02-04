@@ -5,7 +5,7 @@ test_task_api_sandbox:
     path: /api/sandbox/{api_method}
     defaults: {_controller: TestTaskPhotosBundle:ApiSandbox:sandbox}
     requirements:
-        api_method: post_photo|delete_photo|delete_tags|get_photos
+        api_method: post_photo|post_tags_to_photo|delete_photo|delete_tags|get_photos
 
 NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"

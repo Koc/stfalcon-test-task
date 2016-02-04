@@ -76,6 +76,35 @@ class ApiController extends Controller
     }
 
     /**
+     * @ApiDoc(description="Associate photo with tags.")
+     *
+     * @ParamConverter("photo", class="TestTaskPhotosBundle:Photo")
+     *
+     * @Rest\Post("/photos/{id}/tags")
+     * @Rest\RequestParam(name="tags", requirements=".+", nullable=false, map=true, description="Tags that associates photo.")
+     * @Rest\View()
+     */
+    public function postTagsToPhotoAction(Photo $photo, array $tags)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        //TODO: add validation and maybe form
+
+        if ($tags) {
+            $tags = $em->getRepository('TestTaskTagsBundle:Tag')->findOrCreateByTitles($tags);
+        }
+
+        foreach ($tags as $tag) {
+            $photo->addTag($tag);
+        }
+
+        $em->persist($photo);
+        $em->flush();
+
+        return array('photo' => $photo);
+    }
+
+    /**
      * @ApiDoc(description="Deletes photo.")
      *
      * @ParamConverter("photo", class="TestTaskPhotosBundle:Photo")

@@ -59,6 +59,23 @@ class ApiSandboxController extends Controller
                     )
                 ),
             ),
+            'post_tags_to_photo' => array(
+                'uri' => '/photos/{id}/tags',
+                'method' => 'post',
+                'params' => array(
+                    'id' => array(
+                        'label' => 'Айди фото',
+                        'required' => true,
+                    )
+                ),
+                'fields' => array(
+                    'tags' => array(
+                        'label' => 'Теги',
+                        'multuple' => true,
+                        'required' => true,
+                    )
+                ),
+            ),
         );
 
         $apiConfig = array_map(function($config) {
