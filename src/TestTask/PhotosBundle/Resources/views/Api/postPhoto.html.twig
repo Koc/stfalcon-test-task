@@ -1,0 +1,25 @@
+{% extends 'TestTaskPhotosBundle:Api:_api_sandbox_layout.html.twig' %}
+
+{% block request_method 'POST' %}
+
+{% block request_uri path('post_photo') %}
+
+{% block request_params %}
+    <tr>
+        <td>
+            Фото:
+        </td>
+        <td>
+            <input type="file" file-model="request.image" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Теги:
+        </td>
+        <td>
+            <input type="text" ng-model="request.tags" ng-list="," />
+            <p class="help-text">Можно вводить несколько тегов через запятую.</p>
+        </td>
+    </tr>
+{% endblock %}

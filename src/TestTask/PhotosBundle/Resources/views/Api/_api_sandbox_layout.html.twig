@@ -11,11 +11,6 @@
 
         <style type="text/css" media="screen">
             #response {
-                /*position: absolute;*/
-                /*top: 0;*/
-                /*right: 0;*/
-                /*bottom: 0;*/
-                /*left: 0;*/
                 width: 100%;
                 height: 400px;
             }
@@ -31,7 +26,7 @@
             <ul class="menu">
                 {#<li class="menu-text">Blog</li>#}
                 <li><a href="{{ path('nelmio_api_doc_index') }}">Документация API</a></li>
-                <li><a href="#">Загрузка фото</a></li>
+                <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'post_photo'}) }}">Загрузка фото</a></li>
                 <li><a href="#">Добавление тегов к фото</a></li>
                 <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'delete_tags'}) }}">Удаление тегов</a></li>
                 <li><a href="#">Удаление фото</a></li>
@@ -42,7 +37,7 @@
     </div>
 
     <div class="row medium-8 large-7 columns">
-        <div ng-controller="Api.Sandbox.SandboxController as sandboxController">
+        <form ng-controller="Api.Sandbox.SandboxController as sandboxController">
 
             <input type="hidden" ng-model="requestMethod" value="{%- block request_method 'GET' -%}" initial-value />
             <input type="hidden" ng-model="requestUri" value="{%- block request_uri app.request.getRequestUri() -%}"
@@ -61,7 +56,7 @@
 
                 <tr>
                     <td colspan="2">
-                        <input type="button" ng-click="sandboxController.sendRequest()"
+                        <input type="submit" ng-click="sandboxController.sendRequest()"
                                ng-class="{'secondary' : requestSubmitting, 'success': !requestSubmitting}"
                                ng-disabled="requestSubmitting"
                                value="send" class="button" />
@@ -77,7 +72,7 @@
 
                 </tbody>
             </table>
-        </div>
+        </form>
     </div>
 
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -95,7 +90,18 @@
         editor.getSession().setMode('ace/mode/json');
 
         angular.module('Api.Sandbox', ['initialValue'])
-                .controller('Api.Sandbox.SandboxController', ['$scope', '$http', function ($scope, $http) {
+                .directive('fileModel', ['$parse', function ($parse) {
+                    return {
+                        restrict: 'A',
+                        link: function (scope, element, attrs) {
+                            element.bind('change', function () {
+                                $parse(attrs.fileModel).assign(scope, element[0].files);
+                                scope.$apply();
+                            });
+                        }
+                    };
+                }])
+                .controller('Api.Sandbox.SandboxController', ['$scope', '$http', function ($scope, $http, Upload) {
                     $scope.requestSubmitting = false;
 
                     this.sendRequest = function () {
@@ -108,11 +114,10 @@
                             method: requestMethod,
                             url: requestUri,
                             params: {},
-                            data: {}
-//                            transformResponse: undefined
+                            data: new FormData(),
+                            transformRequest: angular.identity,
+                            headers: {'Content-Type': undefined}
                         };
-
-//                        var dataKey = requestMethod === 'GET' ? 'params' : 'data';
 
                         if ($scope.request) {
                             if (requestMethod === 'GET') {
@@ -123,7 +128,19 @@
                                     requestConfig.params[key] = value;
                                 });
                             } else {
-                                requestConfig.data = $scope.request;
+                                angular.forEach($scope.request, function (value, key) {
+                                    if (value instanceof FileList) {
+                                        angular.forEach(value, function (file) {
+                                            requestConfig.data.append(key, file);
+                                        });
+                                    } else if (value instanceof Array) {
+                                        angular.forEach(value, function (file) {
+                                            requestConfig.data.append(key + '[]', file);
+                                        });
+                                    } else {
+                                        requestConfig.data.append(key, value);
+                                    }
+                                });
                             }
                         }
 
@@ -135,7 +152,6 @@
                                 }, function errorCallback(response) {
                                     $scope.requestSubmitting = false;
                                 });
-
                     }
                 }]);
     </script>

@@ -10,6 +10,7 @@ class ApiSandboxController extends Controller
     {
         $templates = array(
             'delete_photo' => '',
+            'post_photo' => '@TestTaskPhotos/Api/postPhoto.html.twig',
             'delete_tags' => '@TestTaskPhotos/Api/deleteTags.html.twig',
         );
 

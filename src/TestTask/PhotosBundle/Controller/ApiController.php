@@ -11,7 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use TestTask\PhotosBundle\Entity\Photo;
 use TestTask\PhotosBundle\Model\PhotosCollection;
-use TestTask\TagsBundle\Entity\Tag;
 
 // http://symfony.com/doc/master/bundles/FOSRestBundle/5-automatic-route-generation_single-restful-controller.html
 
@@ -24,11 +23,12 @@ class ApiController extends Controller
      *
      * @Rest\QueryParam(name="page", requirements="\d+", default="1", description="Page number.")
      * @Rest\QueryParam(name="tags", requirements=".+", map=true, description="Tags for filtering.")
-     * @Rest\View()
+     * @Rest\View(template="@TestTaskPhotos/Api/getPhotos.html.twig")
      */
-    public function getPhotosAction($page, array $tags = array())
+    public function getPhotosAction($page, array $tags = null)
     {
         $doctrine = $this->getDoctrine();
+        $tags = (array)$tags;
 
         if ($tags) {
             $tags = $doctrine->getRepository('TestTaskTagsBundle:Tag')->findBy(array('title' => $tags));
@@ -56,8 +56,6 @@ class ApiController extends Controller
     public function postPhotoAction(UploadedFile $image, array $tags)
     {
         $em = $this->getDoctrine()->getManager();
-
-        $tags = array('thai', 'Ololo');
 
         //TODO: add validation and maybe form
 
