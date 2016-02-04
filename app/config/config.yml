@@ -105,9 +105,9 @@ fos_rest:
 #        default_format: html
     format_listener:
         rules:
-            - { path: ^/, priorities: [ json, html ], fallback_format: ~, prefer_extension: true }
+            - { path: ^/, priorities: [ json, html ], fallback_format: json, prefer_extension: true }
     routing_loader:
-        default_format: ~
+        default_format: json
 
 nelmio_api_doc: ~
 
