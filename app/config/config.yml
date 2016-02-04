@@ -90,6 +90,8 @@ liip_imagine:
 
 fos_rest:
     param_fetcher_listener: force
+#    body_converter:
+#        enabled: true
     view:
         view_response_listener: true
 #        view_response_listener: force

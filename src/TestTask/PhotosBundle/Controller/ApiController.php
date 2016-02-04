@@ -64,13 +64,13 @@ class ApiController extends Controller
     }
 
     /**
-     * @ApiDoc(description="Deletes tags.")
+     * @ApiDoc(description="Deletes tags by they titles.")
      *
      * @Rest\Post("/tags")
      * @Rest\RequestParam(name="tags", requirements=".+", array=true, allowBlank=false, description="Tags titles for deletion.")
      * @Rest\View()
      */
-    public function deleteTagAction(array $tags)
+    public function deleteTagsAction(array $tags)
     {
         $em = $this->getDoctrine()->getManager();
 

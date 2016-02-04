@@ -1,6 +1,12 @@
 _liip_imagine:
     resource: "@LiipImagineBundle/Resources/config/routing.xml"
 
+test_task_api_sandbox:
+    path: /api/sandbox/{api_method}
+    defaults: {_controller: TestTaskPhotosBundle:ApiSandbox:sandbox}
+    requirements:
+        api_method: delete_photo|delete_tags
+
 NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
     prefix:   /api/doc
@@ -9,6 +15,3 @@ test_task_photos_api:
     type:     rest
     resource: TestTask\PhotosBundle\Controller\ApiController
 
-test_task_index:
-    path: /
-    defaults: {_controller: FrameworkBundle:Redirect:redirect, route: nelmio_api_doc_index}

@@ -15,6 +15,13 @@
             <tag name="jms_serializer.event_subscriber" />
         </service>
 
+        <service id="test_task_photos.convert_json_input_listener"
+                 class="TestTask\PhotosBundle\EventListener\ConvertJsonInputListener">
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequestAfterSecurity"
+                 priority="8" />
+        </service>
+
+
     </services>
 
 </container>

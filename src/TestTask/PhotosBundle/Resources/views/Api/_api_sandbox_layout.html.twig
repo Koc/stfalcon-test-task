@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    {% block head %}
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test Task Api Sandbox</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.1.2/foundation.css">
+        {#<link href='http://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css' rel='stylesheet'#}
+        {#type='text/css'>#}
+
+        <style type="text/css" media="screen">
+            #response {
+                /*position: absolute;*/
+                /*top: 0;*/
+                /*right: 0;*/
+                /*bottom: 0;*/
+                /*left: 0;*/
+                width: 100%;
+                height: 400px;
+            }
+        </style>
+    {% endblock %}
+
+</head>
+<body ng-app="Api.Sandbox">
+{% block body %}
+
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <ul class="menu">
+                {#<li class="menu-text">Blog</li>#}
+                <li><a href="{{ path('nelmio_api_doc_index') }}">Документация API</a></li>
+                <li><a href="#">Загрузка фото</a></li>
+                <li><a href="#">Добавление тегов к фото</a></li>
+                <li><a href="{{ path('test_task_api_sandbox', {'api_method': 'delete_tags'}) }}">Удаление тегов</a></li>
+                <li><a href="#">Удаление фото</a></li>
+                <li><a href="{{ path('get_photos') }}">Вывод фото с пагинацией и возможностью фильтрации по тегам</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row medium-8 large-7 columns">
+        <div ng-controller="Api.Sandbox.SandboxController as sandboxController">
+
+            <input type="hidden" ng-model="requestMethod" value="{%- block request_method 'GET' -%}" initial-value />
+            <input type="hidden" ng-model="requestUri" value="{%- block request_uri app.request.getRequestUri() -%}"
+                   initial-value />
+
+            <table>
+                <thead>
+                <tr>
+                    <th width="200px">Параметр</th>
+                    <th width="400px">Значение</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% block request_params '' %}
+
+                <tr>
+                    <td colspan="2">
+                        <input type="button" ng-click="sandboxController.sendRequest()"
+                               ng-class="{'secondary' : requestSubmitting, 'success': !requestSubmitting}"
+                               ng-disabled="requestSubmitting"
+                               value="send" class="button" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <div id="response"></div>
+                    </td>
+
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.1.2/foundation.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.3/ace.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js"></script>
+    <script src="//cdn.jsdelivr.net/angular.initial-value/latest/angular-initial-value.min.js"></script>
+
+    <script>
+        $(document).foundation();
+
+        var editor = ace.edit('response');
+        editor.setTheme('ace/theme/twilight');
+        editor.getSession().setMode('ace/mode/json');
+
+        angular.module('Api.Sandbox', ['initialValue'])
+                .controller('Api.Sandbox.SandboxController', ['$scope', '$http', function ($scope, $http) {
+                    $scope.requestSubmitting = false;
+
+                    this.sendRequest = function () {
+                        $scope.requestSubmitting = true;
+
+                        var requestUri = $scope.requestUri.trim();
+                        var requestMethod = $scope.requestMethod.trim();
+
+                        var requestConfig = {
+                            method: requestMethod,
+                            url: requestUri,
+                            params: {},
+                            data: {}
+//                            transformResponse: undefined
+                        };
+
+//                        var dataKey = requestMethod === 'GET' ? 'params' : 'data';
+
+                        if ($scope.request) {
+                            if (requestMethod === 'GET') {
+                                angular.forEach($scope.request, function (value, key) {
+                                    if (angular.isArray(value)) {
+                                        key += '[]';
+                                    }
+                                    requestConfig.params[key] = value;
+                                });
+                            } else {
+                                requestConfig.data = $scope.request;
+                            }
+                        }
+
+                        $http(requestConfig)
+                                .then(function successCallback(response) {
+//                                    console.log(response);
+                                    editor.setValue(JSON.stringify(response.data, null, 4), -1);
+                                    $scope.requestSubmitting = false;
+                                }, function errorCallback(response) {
+                                    $scope.requestSubmitting = false;
+                                });
+
+                    }
+                }]);
+    </script>
+{% endblock body %}
+</body>
+</html>
