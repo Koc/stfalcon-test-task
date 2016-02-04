@@ -8,6 +8,7 @@ use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use TestTask\PhotosBundle\Entity\Photo;
 use TestTask\PhotosBundle\Model\PhotosCollection;
 use TestTask\TagsBundle\Entity\Tag;
@@ -22,7 +23,7 @@ class ApiController extends Controller
      * @ApiDoc(description="List of photos with possibility filtering by tags.", resource=true)
      *
      * @Rest\QueryParam(name="page", requirements="\d+", default="1", description="Page number.")
-     * @Rest\QueryParam(name="tags", requirements=".+", array=true, description="Tags for filtering.")
+     * @Rest\QueryParam(name="tags", requirements=".+", map=true, description="Tags for filtering.")
      * @Rest\View()
      */
     public function getPhotosAction($page, array $tags = array())
@@ -43,6 +44,37 @@ class ApiController extends Controller
             ->setCurrentPage($page);
 
         return new PhotosCollection($pagerfanta);
+    }
+
+    /**
+     * @ApiDoc(description="Uploads photo with tags.")
+     *
+     * @Rest\FileParam(name="image", image=true, description="Image to upload.")
+     * @Rest\RequestParam(name="tags", requirements=".+", nullable=false, map=true, description="Tags that associates photo.")
+     * @Rest\View()
+     */
+    public function postPhotoAction(UploadedFile $image, array $tags)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $tags = array('thai', 'Ololo');
+
+        //TODO: add validation and maybe form
+
+        if ($tags) {
+            $tags = $em->getRepository('TestTaskTagsBundle:Tag')->findOrCreateByTitles($tags);
+        }
+
+        $photo = new Photo();
+        $photo->setFile($image);
+        foreach ($tags as $tag) {
+            $photo->addTag($tag);
+        }
+
+        $em->persist($photo);
+        $em->flush();
+
+        return array('photo' => $photo);
     }
 
     /**
@@ -67,7 +99,7 @@ class ApiController extends Controller
      * @ApiDoc(description="Deletes tags by they titles.")
      *
      * @Rest\Post("/tags")
-     * @Rest\RequestParam(name="tags", requirements=".+", array=true, allowBlank=false, description="Tags titles for deletion.")
+     * @Rest\RequestParam(name="tags", requirements=".+", map=true, allowBlank=false, description="Tags titles for deletion.")
      * @Rest\View()
      */
     public function deleteTagsAction(array $tags)

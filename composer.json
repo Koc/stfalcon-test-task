@@ -18,7 +18,8 @@
         "sensio/framework-extra-bundle": "^3.0.2",
         "incenteev/composer-parameter-handler": "~2.0",
         "white-october/pagerfanta-bundle": "^1.0",
-        "friendsofsymfony/rest-bundle": "^1.7",
+        "willdurand/negotiation": "^2.0",
+        "friendsofsymfony/rest-bundle": "dev-master",
         "nelmio/api-doc-bundle": "^2.11",
         "vich/uploader-bundle": "^0.14.0",
         "liip/imagine-bundle": "^1.4",
@@ -49,6 +50,7 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
         ]
     },
+    "prefer-stable": true,
     "config": {
         "bin-dir": "bin",
         "platform": {

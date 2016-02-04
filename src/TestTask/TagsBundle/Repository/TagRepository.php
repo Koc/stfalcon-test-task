@@ -3,6 +3,7 @@
 namespace TestTask\TagsBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use TestTask\TagsBundle\Entity\Tag;
 
 /**
  * TagRepository
@@ -12,4 +13,36 @@ use Doctrine\ORM\EntityRepository;
  */
 class TagRepository extends EntityRepository
 {
+    /**
+     * @param array $titles
+     *
+     * @return Tag[]
+     */
+    public function findOrCreateByTitles(array $titles)
+    {
+        $tags = $this->findBy(array('title' => $titles));
+        /* @var $tags Tag[] */
+
+        $tagsCollection = array();
+        foreach ($tags as $tag) {
+            $tagsCollection[$tag->getNormalizedTitle()] = $tag;
+        }
+
+        $normalizedTitles = array();
+        foreach ($titles as $title) {
+            $normalizedTitles[mb_strtolower($title)] = $title;
+        }
+
+        $tagsToCreate = array_diff($normalizedTitles, array_keys($tagsCollection));
+
+        foreach ($tagsToCreate as $title) {
+            $tag = new Tag();
+            $tag->setTitle($title);
+            $this->_em->persist($tag);
+
+            $tagsCollection[$tag->getNormalizedTitle()] = $tag;
+        }
+
+        return $tagsCollection;
+    }
 }

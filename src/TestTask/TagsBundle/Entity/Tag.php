@@ -73,6 +73,11 @@ class Tag
         return $this->title;
     }
 
+    public function getNormalizedTitle()
+    {
+        return mb_strtolower($this->title);
+    }
+
     /**
      * Set createdAt
      *
